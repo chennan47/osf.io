@@ -5,7 +5,6 @@
 <div class="wiki">
     <div class="row">
         <div class="col-sm-3">
-            <%include file="wiki/templates/nav.mako"/>
             <%include file="wiki/templates/toc.mako"/>
         </div>
         <div class="col-sm-9">
