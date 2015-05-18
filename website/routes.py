@@ -197,6 +197,13 @@ def make_url_map(app):
         Rule(
             '/presentations/',
             'get',
+            conference_views.redirect_to_meetings,
+            json_renderer,
+        ),
+
+        Rule(
+            '/meetings/',
+            'get',
             conference_views.conference_view,
             OsfWebRenderer('public/pages/meeting_landing.mako'),
         ),

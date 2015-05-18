@@ -8,6 +8,7 @@ from modularodm import Q
 from modularodm.exceptions import ModularOdmException
 
 from framework.exceptions import HTTPError
+from framework.flask import redirect
 from framework.transactions.context import TokuTransaction
 from framework.transactions.handlers import no_auto_transaction
 
@@ -197,6 +198,10 @@ def conference_results(meeting):
         # Needed in order to use base.mako namespace
         'settings': settings,
     }
+
+
+def redirect_to_meetings(**kwargs):
+    return redirect('/meetings/')
 
 
 def conference_view(**kwargs):
