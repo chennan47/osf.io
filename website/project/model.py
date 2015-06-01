@@ -339,6 +339,7 @@ class NodeLog(StoredObject):
     FILE_COPIED = 'addon_file_copied'
 
     FOLDER_CREATED = 'folder_created'
+    FOLDER_RENAMED = 'folder_renamed'
 
     FILE_ADDED = 'file_added'
     FILE_UPDATED = 'file_updated'

@@ -81,5 +81,6 @@ module.exports = {
         return buildFromTreebeard('zip?', item, options);
     },
     copyUrl: function(){return window.contextVars.waterbutlerURL + 'ops/copy';},
-    moveUrl: function(){return window.contextVars.waterbutlerURL + 'ops/move';}
+    moveUrl: function(){return window.contextVars.waterbutlerURL + 'ops/move';},
+    renameUrl: function(){return window.contextVars.waterbutlerURL + 'ops/rename';}
 };

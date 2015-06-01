@@ -202,7 +202,7 @@ def create_waterbutler_log(payload, **kwargs):
     auth = Auth(user=user)
     node = kwargs['node'] or kwargs['project']
 
-    if action in (NodeLog.FILE_MOVED, NodeLog.FILE_COPIED):
+    if action in (NodeLog.FILE_MOVED, NodeLog.FILE_COPIED, NodeLog.FOLDER_RENAMED):
         for bundle in ('source', 'destination'):
             for key in ('provider', 'materialized', 'name', 'nid'):
                 if key not in payload[bundle]:
