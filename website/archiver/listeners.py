@@ -71,13 +71,14 @@ def archive_callback(dst):
         for node in node_and_primary_descendants(root):
             node.update_search()  # update search if public
     else:
-        archiver_utils.handle_archive_fail(
-            ARCHIVER_UNCAUGHT_ERROR,
-            root.registered_from,
-            root,
-            root.registered_user,
-            dst.archive_job.target_addons,
-        )
+        if not root.parent_node:
+            archiver_utils.handle_archive_fail(
+                ARCHIVER_UNCAUGHT_ERROR,
+                root.registered_from,
+                root,
+                root.registered_user,
+                dst.archive_job.target_addons,
+            )
 
 
 @archiver_signals.archive_fail.connect
