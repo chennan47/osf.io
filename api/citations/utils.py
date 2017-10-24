@@ -1,6 +1,6 @@
 import os
 import re
-
+import logging
 from citeproc import CitationStylesStyle, CitationStylesBibliography
 from citeproc import Citation, CitationItem
 from citeproc import formatter
@@ -8,6 +8,9 @@ from citeproc.source.json import CiteProcJSON
 
 from osf.models import PreprintService
 from website.settings import CITATION_STYLES_PATH, BASE_PATH, CUSTOM_CITATIONS
+
+
+logger = logging.getLogger(__file__)
 
 
 def clean_up_common_errors(cit):
@@ -46,22 +49,59 @@ def render_citation(node, style='apa'):
     else:
         data = [node.csl, ]
 
+    logger.info('-----------------')
+    logger.info('data')
+    logger.info(data)
+    logger.info('-----------------')
+
     bib_source = CiteProcJSON(data)
+    logger.info('-----------------')
+    logger.info('bib_source')
+    logger.info(bib_source)
+    logger.info('-----------------')
 
     custom = CUSTOM_CITATIONS.get(style, False)
+
     path = os.path.join(BASE_PATH, 'static', custom) if custom else os.path.join(CITATION_STYLES_PATH, style)
+    logger.info('-----------------')
+    logger.info('path')
+    logger.info(path)
+    logger.info('-----------------')
+
     bib_style = CitationStylesStyle(path, validate=False)
+    logger.info('-----------------')
+    logger.info('bib_style')
+    logger.info(bib_style)
+    logger.info('-----------------')
 
     bibliography = CitationStylesBibliography(bib_style, bib_source, formatter.plain)
+    logger.info('-----------------')
+    logger.info('bibliography')
+    logger.info(bibliography)
+    logger.info('-----------------')
 
     citation = Citation([CitationItem(node._id)])
+    logger.info('-----------------')
+    logger.info('citation')
+    logger.info(citation)
+    logger.info('-----------------')
 
     bibliography.register(citation)
 
     bib = bibliography.bibliography()
+    logger.info('-----------------')
+    logger.info('bib')
+    logger.info(bib)
+    logger.info('-----------------')
+
     cit = unicode(bib[0] if len(bib) else '')
+    logger.info('-----------------')
+    logger.info('cit')
+    logger.info(cit)
+    logger.info('-----------------')
 
     title = csl['title'] if csl else node.csl['title']
+
     if cit.count(title) == 1:
         i = cit.index(title)
         prefix = clean_up_common_errors(cit[0:i])
