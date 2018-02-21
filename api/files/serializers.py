@@ -6,10 +6,11 @@ import furl
 import pytz
 
 from framework.auth.core import Auth
-from osf.models import BaseFileNode, OSFUser, Comment
+from osf.models import BaseFileNode, OSFUser, Comment, QuickFilesNode
 from rest_framework import serializers as ser
 from website import settings
 from website.util import api_v2_url
+from website import util as website_utils
 
 from api.base.serializers import (
     FileCommentRelationshipField,
@@ -28,6 +29,7 @@ from api.base.serializers import (
 from api.base.exceptions import Conflict
 from api.base.utils import absolute_reverse
 from api.base.utils import get_user_auth
+
 
 class CheckoutField(ser.HyperlinkedRelatedField):
 
@@ -339,6 +341,28 @@ class QuickFilesSerializer(BaseFileSerializer):
                              related_view_kwargs={'user_id': '<node.creator._id>'},
                              help_text='The user who uploaded this file'
                              )
+    links = LinksField({
+        'upload': 'upload_url',
+        'download': 'download_url'
+    })
+
+    def get_url(self, user):
+        quickfiles_guid = user.nodes_created.filter(
+            type=QuickFilesNode._typedmodels_type
+        ).values_list('guids___id', flat=True).get()
+        return website_utils.waterbutler_api_url_for(quickfiles_guid, 'osfstorage')
+
+    def upload_url(self, obj):
+        return {
+            'href': self.get_url(obj),
+            'meta': {}
+        }
+
+    def download_url(self, obj):
+        return {
+            'href': '{}?zip='.format(self.get_url(obj)),
+            'meta': {}
+        }
 
 
 class QuickFilesDetailSerializer(QuickFilesSerializer):

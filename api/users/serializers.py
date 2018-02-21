@@ -1,7 +1,7 @@
 from guardian.models import GroupObjectPermission
 
 from rest_framework import serializers as ser
-from django.db.models import Prefetch
+
 from api.base.exceptions import InvalidModelValueError
 from api.base.serializers import (
     BaseAPISerializer, JSONAPISerializer, JSONAPIRelationshipSerializer,
@@ -12,25 +12,7 @@ from api.base.serializers import (
 from api.base.utils import absolute_reverse, get_user_auth
 from api.files.serializers import QuickFilesSerializer
 from osf.exceptions import ValidationValueError, ValidationError
-from osf.models import OSFUser, QuickFilesNode, Guid
-from website import util as website_utils
-
-
-class QuickFilesRelationshipField(RelationshipField):
-
-    def to_representation(self, value):
-        relationship_links = super(QuickFilesRelationshipField, self).to_representation(value)
-        quickfiles_guid = value.nodes_created.filter(type=QuickFilesNode._typedmodels_type).values_list('guids___id', flat=True).get()
-        upload_url = website_utils.waterbutler_api_url_for(quickfiles_guid, 'osfstorage')
-        relationship_links['links']['upload'] = {
-            'href': upload_url,
-            'meta': {}
-        }
-        relationship_links['links']['download'] = {
-            'href': '{}?zip='.format(upload_url),
-            'meta': {}
-        }
-        return relationship_links
+from osf.models import OSFUser
 
 
 class UserSerializer(JSONAPISerializer):
@@ -69,7 +51,7 @@ class UserSerializer(JSONAPISerializer):
         related_meta={'projects_in_common': 'get_projects_in_common'},
     ))
 
-    quickfiles = HideIfDisabled(QuickFilesRelationshipField(
+    quickfiles = HideIfDisabled(RelationshipField(
         related_view='users:user-quickfiles',
         related_view_kwargs={'user_id': '<_id>'},
     ))
