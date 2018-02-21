@@ -1,7 +1,7 @@
 from guardian.models import GroupObjectPermission
 
 from rest_framework import serializers as ser
-
+from django.db.models import Prefetch
 from api.base.exceptions import InvalidModelValueError
 from api.base.serializers import (
     BaseAPISerializer, JSONAPISerializer, JSONAPIRelationshipSerializer,
@@ -12,7 +12,7 @@ from api.base.serializers import (
 from api.base.utils import absolute_reverse, get_user_auth
 from api.files.serializers import QuickFilesSerializer
 from osf.exceptions import ValidationValueError, ValidationError
-from osf.models import OSFUser, QuickFilesNode
+from osf.models import OSFUser, QuickFilesNode, Guid
 from website import util as website_utils
 
 
@@ -21,6 +21,14 @@ class QuickFilesRelationshipField(RelationshipField):
     def to_representation(self, value):
         relationship_links = super(QuickFilesRelationshipField, self).to_representation(value)
         quickfiles_guid = value.nodes_created.filter(type=QuickFilesNode._typedmodels_type).values_list('guids___id', flat=True).get()
+        # quickfiles_guid = value.nodes_created.filter(
+        #     type=QuickFilesNode._typedmodels_type
+        # ).prefetch_related(
+        #     Prefetch(
+        #         'guids',
+        #         queryset=Guid.objects.select_related('_id')
+        #     )
+        # ).first()
         upload_url = website_utils.waterbutler_api_url_for(quickfiles_guid, 'osfstorage')
         relationship_links['links']['upload'] = {
             'href': upload_url,
