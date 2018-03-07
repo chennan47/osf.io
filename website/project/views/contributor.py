@@ -407,7 +407,6 @@ def send_claim_registered_email(claimer, unclaimed_user, node, throttle=24 * 360
         node=node,
         claim_url=claim_url,
         fullname=unclaimed_record['name'],
-        osf_contact_email=settings.OSF_CONTACT_EMAIL,
     )
     unclaimed_record['last_sent'] = get_timestamp()
     unclaimed_user.save()
@@ -419,7 +418,6 @@ def send_claim_registered_email(claimer, unclaimed_user, node, throttle=24 * 360
         fullname=claimer.fullname,
         referrer=referrer,
         node=node,
-        osf_contact_email=settings.OSF_CONTACT_EMAIL,
     )
 
 
@@ -493,8 +491,7 @@ def send_claim_email(email, unclaimed_user, node, notify=True, throttle=24 * 360
                 user=unclaimed_user,
                 referrer=referrer,
                 fullname=unclaimed_record['name'],
-                node=node,
-                osf_contact_email=settings.OSF_CONTACT_EMAIL,
+                node=node
             )
         mail_tpl = mails.FORWARD_INVITE
         to_addr = referrer.username
@@ -509,8 +506,7 @@ def send_claim_email(email, unclaimed_user, node, notify=True, throttle=24 * 360
         claim_url=claim_url,
         email=claimer_email,
         fullname=unclaimed_record['name'],
-        branded_service=preprint_provider,
-        osf_contact_email=settings.OSF_CONTACT_EMAIL,
+        branded_service=preprint_provider
     )
 
     return to_addr
@@ -556,8 +552,7 @@ def notify_added_contributor(node, contributor, auth=None, throttle=None, email_
             node=node,
             referrer_name=auth.user.fullname if auth else '',
             all_global_subscriptions_none=check_if_all_global_subscriptions_are_none(contributor),
-            branded_service=preprint_provider,
-            osf_contact_email=settings.OSF_CONTACT_EMAIL
+            branded_service=preprint_provider
         )
 
         contributor.contributor_added_email_records[node._id]['last_sent'] = get_timestamp()
@@ -762,7 +757,6 @@ def claim_user_form(auth, **kwargs):
         'email': claimer_email if claimer_email else '',
         'fullname': user.fullname,
         'form': forms.utils.jsonify(form) if is_json_request() else form,
-        'osf_contact_email': settings.OSF_CONTACT_EMAIL,
     }
 
 

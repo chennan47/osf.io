@@ -173,8 +173,7 @@ def update_user(auth):
             mails.send_mail(user.username,
                             mails.PRIMARY_EMAIL_CHANGED,
                             user=user,
-                            new_address=username,
-                            osf_contact_email=settings.OSF_CONTACT_EMAIL)
+                            new_address=username)
 
             # Remove old primary email from subscribed mailing lists
             for list_name, subscription in user.mailchimp_mailing_lists.iteritems():

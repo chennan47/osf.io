@@ -748,8 +748,7 @@ class TestPreprintConfirmationEmails(OsfTestCase):
             mails.PREPRINT_CONFIRMATION_DEFAULT,
             user=self.user,
             node=self.preprint.node,
-            preprint=self.preprint,
-            osf_contact_email=settings.OSF_CONTACT_EMAIL
+            preprint=self.preprint
         )
 
         assert_equals(send_mail.call_count, 1)

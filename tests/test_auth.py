@@ -75,7 +75,7 @@ class TestAuthUtils(OsfTestCase):
         auth.register_unconfirmed(
             username=user.username,
             password='gattaca',
-            fullname='Rosie'
+            fullname='Rosie',
         )
 
         user.reload()
@@ -99,7 +99,6 @@ class TestAuthUtils(OsfTestCase):
             'mimetype': 'html',
             'mail': mails.WELCOME,
             'to_addr': user.username,
-            'osf_contact_email': settings.OSF_CONTACT_EMAIL
         })
 
         self.app.set_cookie(settings.COOKIE_NAME, user.get_or_create_cookie())
@@ -190,7 +189,6 @@ class TestAuthUtils(OsfTestCase):
             'mimetype': 'plain',
             'mail': mails.PASSWORD_RESET,
             'to_addr': user.username,
-            'osf_contact_email': settings.OSF_CONTACT_EMAIL,
         })
 
     @mock.patch('framework.auth.utils.requests.post')
