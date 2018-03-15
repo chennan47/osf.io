@@ -28,6 +28,7 @@ var ctx = window.contextVars;
 var node = window.contextVars.node;
 var nodeApiUrl = ctx.node.urls.api;
 var nodeCategories = ctx.nodeCategories || [];
+var currentUserRequestState = ctx.currentUserRequestState;
 
 
 // Listen for the nodeLoad event (prevents multiple requests for data)
@@ -42,7 +43,10 @@ $('body').on('nodeLoad', function(event, data) {
         new CitationWidget('#citationStyleInput', '#citationText');
     }
     // Initialize nodeControl
-    new NodeControl.NodeControl('#projectScope', data, {categories: nodeCategories});
+    new NodeControl.NodeControl('#projectScope', data, {categories: nodeCategories, currentUserRequestState: currentUserRequestState});
+
+    // Enable the otherActionsButton once the page is loaded so the menu is properly populated
+    $('#otherActionsButton').removeClass('disabled');
 });
 
 // Initialize comment pane w/ its viewmodel
@@ -199,7 +203,7 @@ $(document).ready(function () {
                     document.getElementById('shareButtonsPopover'),
                     m.component(
                         SocialShare.ShareButtonsPopover,
-                        {title: window.contextVars.node.title, url: window.location.href}
+                        {title: window.contextVars.node.title, url: window.location.href, type: 'link'}
                     )
                 );
             }
@@ -225,9 +229,9 @@ $(document).ready(function () {
         width: '100%',
         interactive: window.contextVars.currentUser.canEditTags,
         maxChars: 128,
-        defaultText: 'add a tag to enhance discoverability',
+        defaultText: 'Add a tag to enhance discoverability',
         onAddTag: function(tag) {
-            $('#node-tags_tag').attr('data-default', 'add a tag');
+            $('#node-tags_tag').attr('data-default', 'Add a tag');
             window.contextVars.node.tags.push(tag);
             var payload = {
                 data: {
@@ -338,4 +342,5 @@ $(document).ready(function () {
             $(elm).text($(elm).text().replace(/\s*$/, ''));
         });
     }
+
 });

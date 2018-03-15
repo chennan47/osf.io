@@ -97,29 +97,45 @@
                                 </ul>
                             </div>
                     </div>
-                    <!-- ko if: canBeOrganized -->
-                    <div class="btn-group" style="display: none;" data-bind="visible: true">
-
-                        <!-- ko ifnot: inDashboard -->
-                           <a id="addDashboardFolder" data-bind="click: addToDashboard, tooltip: {title: 'Add to bookmarks',
-                            placement: 'bottom', container : 'body'}" class="btn btn-default">
-                               <i class="fa fa-bookmark"></i>
-                               <i class="fa fa-plus"></i>
-                           </a>
-                        <!-- /ko -->
-                        <!-- ko if: inDashboard -->
-                           <a id="removeDashboardFolder" data-bind="click: removeFromDashboard, tooltip: {title: 'Remove from bookmarks',
-                            placement: 'bottom', container : 'body'}" class="btn btn-default">
-                               <i class="fa fa-bookmark"></i>
-                               <i class="fa fa-minus"></i>
-                           </a>
-                        <!-- /ko -->
-
+                    <div class="btn-group">
+                        <button class="btn btn-default disabled" data-toggle="collapse" data-target="#otherActions" id="otherActionsButton">
+                            <i class="fa fa-ellipsis-h"></i>
+                        </button>
                     </div>
-                    <!-- /ko -->
-                    % if node["is_public"]:
-                        <div class="btn-group" id="shareButtonsPopover"></div>
-                    % endif
+                    <div class="collapse pull-right" id="otherActions">
+                        <div class="panel" id="other-actions-panel">
+                            <!-- ko if: canBeOrganized -->
+                            <div>
+                                <!-- ko ifnot: inDashboard -->
+                                   <button class="btn btn-block pull-left" id="addDashboardFolder" data-bind="click: addToDashboard">
+                                       Bookmark
+                                   </button>
+                                <!-- /ko -->
+                                <!-- ko if: inDashboard -->
+                                   <button class="btn btn-block" id="removeDashboardFolder" data-bind="click: removeFromDashboard">
+                                       Remove from bookmarks
+                                   </button>
+                                <!-- /ko -->
+                            </div>
+                            <!-- /ko -->
+                            % if node["is_public"]:
+                                <div class="btn btn-block" id="shareButtonsPopover">Share</div>
+                            % endif
+                            % if node['access_requests_enabled'] and not user['is_contributor']:
+                                <div>
+                                %if user_name:
+                                    <button class="btn btn-block" data-bind="click: requestAccess.requestProjectAccess,
+                                                    text: requestAccess.requestAccessButton,
+                                                    css: {'disabled': requestAccess.accessRequestPendingOrDenied()},
+                                                    tooltip: {title: requestAccess.accessRequestTooltip(),'disabled': true, 'placement': 'left'}">
+                                    </button>
+                                %else:
+                                    <a role="button" class="btn btn-block" href="${login_url}" >Login to request access</a>
+                                %endif
+                                </div>
+                            % endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -186,7 +202,7 @@
                         <span data-bind="text: dateModified.local, tooltip: {title: dateModified.utc}" class="date node-last-modified-date"></span>
                     % endif
                     </p>
-                    <span data-bind="if: hasDoi()" class="scripted">
+                <span data-bind="if: hasDoi()" class="scripted">
                   <p>
                     <span data-bind="text:identifier"></span>:
                   DOI <span data-bind="text: doi"></span>
@@ -347,7 +363,9 @@
             %endif
                     <div id="treeGrid">
                         <div class="spinner-loading-wrapper">
-                            <div class="logo-spin logo-lg"></div>
+                            <div class="ball-scale ball-scale-blue">
+                                <div></div>
+                            </div>
                              <p class="m-t-sm fg-load-message"> Loading files...  </p>
                         </div>
                     </div>
@@ -432,7 +450,9 @@
             <div class="panel-body">
                 <div id="logFeed">
                     <div class="spinner-loading-wrapper">
-                        <div class="logo-spin logo-lg"></div>
+                        <div class="ball-scale ball-scale-blue">
+                            <div></div>
+                        </div>
                          <p class="m-t-sm fg-load-message"> Loading logs...  </p>
                     </div>
                 </div>
@@ -512,7 +532,8 @@ ${parent.javascript_bottom()}
                 public: true,
             },
         },
-        customCitations: ${ custom_citations | sjson, n }
+        customCitations: ${ custom_citations | sjson, n },
+        currentUserRequestState: ${ user['access_request_state'] | sjson, n }
     });
 </script>
 

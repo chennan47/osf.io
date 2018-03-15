@@ -72,7 +72,8 @@ class Loggable(models.Model):
             user = request.user
 
         params['node'] = params.get('node') or params.get('project') or self._id
-        original_node = AbstractNode.load(params.get('node'))
+        original_node = self if self._id == params['node'] else AbstractNode.load(params.get('node'))
+
         log = NodeLog(
             action=action, user=user, foreign_user=foreign_user,
             params=params, node=self, original_node=original_node
@@ -104,10 +105,29 @@ class Taggable(models.Model):
 
     def update_tags(self, new_tags, auth=None, save=True, log=True, system=False):
         old_tags = set(self.tags.values_list('name', flat=True))
-        for tag in (set(new_tags) - old_tags):
-            self.add_tag(tag, auth=auth, save=save, log=log, system=system)
-        for tag in (old_tags - set(new_tags)):
-            self.remove_tag(tag, auth, save=save)
+        to_add = (set(new_tags) - old_tags)
+        to_remove = (old_tags - set(new_tags))
+        if to_add:
+            self.add_tags(to_add, auth=auth, save=save, log=log, system=system)
+        if to_remove:
+            self.remove_tags(to_remove, auth=auth, save=save)
+
+    def add_tags(self, tags, auth=None, save=True, log=True, system=False):
+        """
+        Optimization method for use with update_tags. Unlike add_tag, already assumes tag is
+        not on the object.
+        """
+        if not system and not auth:
+            raise ValueError('Must provide auth if adding a non-system tag')
+        for tag in tags:
+            tag_instance, created = Tag.all_tags.get_or_create(name=tag, system=system)
+            self.tags.add(tag_instance)
+            # TODO: Logging belongs in on_tag_added hook
+            if log:
+                self.add_tag_log(tag_instance, auth)
+            self.on_tag_added(tag_instance)
+        if save:
+            self.save()
 
     def add_tag(self, tag, auth=None, save=True, log=True, system=False):
         if not system and not auth:
@@ -499,14 +519,14 @@ class MachineableMixin(models.Model):
         """
         return self.__run_transition(DefaultTriggers.SUBMIT.value, user=user)
 
-    def run_accept(self, user, comment):
+    def run_accept(self, user, comment, **kwargs):
         """Run the 'accept' state transition and create a corresponding Action.
 
         Params:
             user: The user triggering this transition.
             comment: Text describing why.
         """
-        return self.__run_transition(DefaultTriggers.ACCEPT.value, user=user, comment=comment)
+        return self.__run_transition(DefaultTriggers.ACCEPT.value, user=user, comment=comment, **kwargs)
 
     def run_reject(self, user, comment):
         """Run the 'reject' state transition and create a corresponding Action.
