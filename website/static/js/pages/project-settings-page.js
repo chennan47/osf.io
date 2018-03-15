@@ -133,8 +133,6 @@ var subscribeViewModel = function(viewModel, messageObservable, observableName, 
     viewModel.enabled.subscribe(function(newValue) {
         var self = this;
         // debugger;
-        console.log(ctx.node.urls.api + updateUrl);
-
         $osf.postJSON(ctx.node.urls.api + updateUrl, {[objectToUpdate]:newValue}
         ).done(function(response) {
             if (newValue) {
