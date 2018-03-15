@@ -399,7 +399,6 @@ def configure_requests(node, **kwargs):
         'user': kwargs.get('auth').user._id,
     }
     if node.access_requests_enabled:
-
         node.add_log(
             NodeLog.NODE_ACCESS_REQUESTS_ENABLED,
             log_dict,
