@@ -525,9 +525,9 @@ class TestPermissionMethods:
             preprint=preprint, user=user,
             read=True, write=False, admin=False
         )
-        preprint.add_permission(user, permissions.WRITE)
+        preprint.add_permission(user, 'write')
         preprint.save()
-        assert preprint.has_permission(user, permissions.WRITE) is True
+        assert preprint.has_permission(user, 'write') is True
 
     def test_remove_permission(self, preprint):
         assert preprint.has_permission(preprint.creator, permissions.ADMIN) is True

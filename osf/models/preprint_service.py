@@ -424,8 +424,8 @@ class PreprintService(DirtyFieldsMixin, GuidMixin, IdentifierMixin, ReviewableMi
 
             # Add default contributor permissions
             permissions = permissions or DEFAULT_CONTRIBUTOR_PERMISSIONS
-            assign_perm(permissions, contributor_obj, self)
-            contributor_obj.save()
+            assign_perm(permissions, contributor, self)
+            contributor.save()
 
             # Add contributor to recently added list for user
             if auth is not None:
@@ -455,10 +455,10 @@ class PreprintService(DirtyFieldsMixin, GuidMixin, IdentifierMixin, ReviewableMi
             if save:
                 self.save()
 
-            if self._id:
-                project_signals.contributor_added.send(self,
-                                                       contributor=contributor,
-                                                       auth=auth, email_template=send_email)
+            # if self._id:
+            #     project_signals.contributor_added.send(self,
+            #                                            contributor=contributor,
+            #                                            auth=auth, email_template=send_email)
             # self.update_search()  # TODO: uncomment this
             # self.save_node_preprints()  # TODO: decide what to do with this
             return contrib_to_add, True
@@ -1033,11 +1033,10 @@ class PreprintService(DirtyFieldsMixin, GuidMixin, IdentifierMixin, ReviewableMi
         :raises: ValueError if user already has permission
         """
         contributor = user.preprintcontributor_set.get(preprint=self)
-        if not getattr(contributor, permission, False):
-            permission_to_add = expand_permissions(permission)
-            assign_perm(permission_to_add, contributor, self)
-            contributor.save()
-        elif contributor.has_perm(permission, self):
+        if not user.has_perm(permission, self):
+            assign_perm(permission, user, self)
+            user.save()
+        elif user.has_perm(permission, self):
             raise ValueError('User already has permission {0}'.format(permission))
         if save:
             self.save()
